@@ -20,6 +20,15 @@ target_include_directories(${LIBRARY_NAME} PUBLIC
     $<INSTALL_INTERFACE:include>
     )
 
+include(FetchContent)
+FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+    )
+FetchContent_MakeAvailable(googletest)
+
+target_link_libraries(${LIBRARY_NAME} gtest_main)
+
 add_subdirectory(test)
 
 option(BUILD_TEST "Enable/Disable testing" ON)
