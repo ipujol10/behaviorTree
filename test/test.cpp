@@ -43,9 +43,9 @@ TEST(ControlNodeTest, Constructor) {
   delete[] nodes;
 }
 
-class SeqTestTick : public Node {
+class ControlTestTick : public Node {
 public:
-  SeqTestTick(const std::string &name, Status status) : Node(name) {
+  ControlTestTick(const std::string &name, Status status) : Node(name) {
     state = status;
   }
 
@@ -53,22 +53,19 @@ public:
 };
 
 TEST(SequenceTest, Tick) {
-  Node **successNodes = new Node *[3];
-  successNodes[0] = new SeqTestTick("Succ 0", Status::SUCCESS);
-  successNodes[1] = new SeqTestTick("Succ 1", Status::SUCCESS);
-  successNodes[2] = new SeqTestTick("Succ 2", Status::SUCCESS);
+  Node *successNodes[] = {new ControlTestTick("Succ 0", Status::SUCCESS),
+                          new ControlTestTick("Succ 1", Status::SUCCESS),
+                          new ControlTestTick("Succ 2", Status::SUCCESS)};
   Sequence success("Success", successNodes, 3);
 
-  Node **runningNodes = new Node *[3];
-  runningNodes[0] = new SeqTestTick("Run 0", Status::SUCCESS);
-  runningNodes[1] = new SeqTestTick("Run 1", Status::RUNNING);
-  runningNodes[2] = new SeqTestTick("Run 2", Status::SUCCESS);
+  Node *runningNodes[] = {new ControlTestTick("Run 0", Status::SUCCESS),
+                          new ControlTestTick("Run 1", Status::RUNNING),
+                          new ControlTestTick("Run 2", Status::SUCCESS)};
   Sequence running("Running", runningNodes, 3);
 
-  Node **failureNodes = new Node *[3];
-  failureNodes[0] = new SeqTestTick("Fail 0", Status::SUCCESS);
-  failureNodes[1] = new SeqTestTick("Fail 1", Status::SUCCESS);
-  failureNodes[2] = new SeqTestTick("Fail 2", Status::FAILURE);
+  Node *failureNodes[] = {new ControlTestTick("Fail 0", Status::SUCCESS),
+                          new ControlTestTick("Fail 1", Status::SUCCESS),
+                          new ControlTestTick("Fail 2", Status::FAILURE)};
   Sequence failure("Failure", failureNodes, 3);
 
   EXPECT_EQ(success.tick(), Status::SUCCESS);
@@ -88,9 +85,45 @@ TEST(SequenceTest, Tick) {
   EXPECT_EQ(failure.tick(), Status::FAILURE);
   EXPECT_EQ(failure.counter, 2);
   EXPECT_EQ(failure.status(), Status::FAILURE);
+}
 
-  delete[] successNodes;
-  delete[] runningNodes;
-  delete[] failureNodes;
+TEST(SelectorTest, Tick) {
+  Node *successNodes0[] = {new ControlTestTick("Succ 0", Status::SUCCESS),
+                           new ControlTestTick("Succ 1", Status::SUCCESS)};
+  Selector success0("Success 0", successNodes0, 2);
+
+  Node *successNodes1[] = {new ControlTestTick("Fail 0", Status::FAILURE),
+                           new ControlTestTick("Succ 0", Status::SUCCESS)};
+  Selector success1("Success 1", successNodes1, 2);
+
+  Node *runningNodes[] = {new ControlTestTick("Fail 0", Status::FAILURE),
+                          new ControlTestTick("Run 0", Status::RUNNING),
+                          new ControlTestTick("Succ 0", Status::SUCCESS)};
+  Selector running("Running", runningNodes, 3);
+
+  Node *failureNodes[] = {new ControlTestTick("Fail 0", Status::FAILURE),
+                          new ControlTestTick("Fail 1", Status::FAILURE),
+                          new ControlTestTick("Fail 2", Status::FAILURE)};
+  Selector failure("Failure", failureNodes, 3);
+
+  EXPECT_EQ(success0.tick(), Status::SUCCESS);
+  EXPECT_EQ(success0.counter, 0);
+  EXPECT_EQ(success0.tick(), Status::SUCCESS);
+  EXPECT_EQ(success0.counter, 0);
+
+  EXPECT_EQ(success1.tick(), Status::SUCCESS);
+  EXPECT_EQ(success1.counter, 1);
+  EXPECT_EQ(success1.tick(), Status::SUCCESS);
+  EXPECT_EQ(success1.counter, 1);
+
+  EXPECT_EQ(running.tick(), Status::RUNNING);
+  EXPECT_EQ(running.counter, 1);
+  EXPECT_EQ(running.tick(), Status::RUNNING);
+  EXPECT_EQ(running.counter, 1);
+
+  EXPECT_EQ(failure.tick(), Status::FAILURE);
+  EXPECT_EQ(failure.counter, 3);
+  EXPECT_EQ(failure.tick(), Status::FAILURE);
+  EXPECT_EQ(failure.counter, 3);
 }
 } // namespace BT

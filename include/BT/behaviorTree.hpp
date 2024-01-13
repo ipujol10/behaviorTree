@@ -43,4 +43,12 @@ public:
 
   FRIEND_TEST(SequenceTest, Tick);
 };
+
+class Selector final: public ControlNode {
+public:
+  Selector(const std::string &name, Node **nodes, int length);
+  Status tick() override final;
+
+  FRIEND_TEST(SelectorTest, Tick);
+};
 } // namespace BT

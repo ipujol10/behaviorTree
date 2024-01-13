@@ -37,4 +37,17 @@ Status Sequence::tick() {
   }
   return Status::SUCCESS;
 }
+
+Selector::Selector(const std::string &name, Node **nodes, int length)
+    : ControlNode(name, nodes, length) {}
+
+Status Selector::tick() {
+  for (counter = 0; counter < length; counter++) {
+    state = nodes[counter]->tick();
+    if (state != Status::FAILURE) {
+      return state;
+    }
+  }
+  return Status::FAILURE;
+}
 } // namespace BT
