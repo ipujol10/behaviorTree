@@ -25,17 +25,19 @@ public:
 /***************
  * Control Nodes
  ***************/
-class Sequence final : Node {
+class Sequence final : public Node {
 private:
   int counter;
-  const Node **nodes;
+  Node **nodes;
   const int length;
 
 public:
-  Sequence(const std::string &name, const Node **nodes, int length);
+  Sequence(const std::string &name, Node **nodes, int length);
   ~Sequence();
   int getLength() const;
+  Status tick() override final;
 
   FRIEND_TEST(SequenceTest, Constructor);
+  FRIEND_TEST(SequenceTest, Tick);
 };
 } // namespace BT
