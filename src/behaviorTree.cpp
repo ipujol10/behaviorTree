@@ -9,7 +9,7 @@ std::string Node::getName() const { return name; }
 
 Status Node::status() const { return state; }
 
-Sequence::Sequence(const std::string &name, Node **nodes, int length)
+ControlNode::ControlNode(const std::string &name, Node **nodes, int length)
     : length(length), Node(name), counter(0) {
   this->nodes = new Node *[length];
   for (int i = 0; i < length; i++) {
@@ -17,9 +17,12 @@ Sequence::Sequence(const std::string &name, Node **nodes, int length)
   }
 }
 
-Sequence::~Sequence() { delete[] nodes; }
+ControlNode::~ControlNode() { delete[] nodes; }
 
-int Sequence::getLength() const { return length; }
+int ControlNode::getLength() const { return length; }
+
+Sequence::Sequence(const std::string &name, Node **nodes, int length)
+    : ControlNode(name, nodes, length) {}
 
 Status Sequence::tick() {
   if (state != Status::RUNNING) {

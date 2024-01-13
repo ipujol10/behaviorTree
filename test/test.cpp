@@ -22,7 +22,7 @@ TEST(NodeTest, Tick) {
 }
 
 namespace BT {
-TEST(SequenceTest, Constructor) {
+TEST(ControlNodeTest, Constructor) {
   int N = 5;
   Node **nodes = new Node *[N];
   for (int i = 0; i < N; i++) {
@@ -30,15 +30,15 @@ TEST(SequenceTest, Constructor) {
     nodeName << "Node " << i;
     nodes[i] = new Node(nodeName.str());
   }
-  Sequence s("Sequence", nodes, N);
+  ControlNode control("Control Node", nodes, N);
 
-  EXPECT_EQ(s.counter, 0);
-  EXPECT_EQ(s.getName(), "Sequence");
-  EXPECT_EQ(s.getLength(), 5);
-  for (int i = 0; i < s.getLength(); i++) {
+  EXPECT_EQ(control.counter, 0);
+  EXPECT_EQ(control.getName(), "Control Node");
+  EXPECT_EQ(control.getLength(), 5);
+  for (int i = 0; i < control.getLength(); i++) {
     std::stringstream nodeName;
     nodeName << "Node " << i;
-    EXPECT_EQ(s.nodes[i]->getName(), nodeName.str());
+    EXPECT_EQ(control.nodes[i]->getName(), nodeName.str());
   }
   delete[] nodes;
 }

@@ -22,22 +22,25 @@ public:
   Status status() const;
 };
 
-/***************
- * Control Nodes
- ***************/
-class Sequence final : public Node {
-private:
+class ControlNode : public Node {
+protected:
   int counter;
   Node **nodes;
   const int length;
 
 public:
-  Sequence(const std::string &name, Node **nodes, int length);
-  ~Sequence();
+  ControlNode(const std::string &name, Node **nodes, int length);
+  ~ControlNode();
   int getLength() const;
+
+  FRIEND_TEST(ControlNodeTest, Constructor);
+};
+
+class Sequence final : public ControlNode {
+public:
+  Sequence(const std::string &name, Node **nodes, int length);
   Status tick() override final;
 
-  FRIEND_TEST(SequenceTest, Constructor);
   FRIEND_TEST(SequenceTest, Tick);
 };
 } // namespace BT
