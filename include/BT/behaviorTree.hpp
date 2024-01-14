@@ -25,11 +25,11 @@ public:
 class ControlNode : public Node {
 protected:
   int counter;
-  Node **nodes;
+  Node **children;
   const int length;
 
 public:
-  ControlNode(const std::string &name, Node **nodes, int length);
+  ControlNode(const std::string &name, Node **children, int length);
   ~ControlNode();
   int getLength() const;
 
@@ -38,7 +38,7 @@ public:
 
 class Sequence final : public ControlNode {
 public:
-  Sequence(const std::string &name, Node **nodes, int length);
+  Sequence(const std::string &name, Node **children, int length);
   Status tick() override final;
 
   FRIEND_TEST(SequenceTest, Tick);
@@ -46,7 +46,7 @@ public:
 
 class Selector final : public ControlNode {
 public:
-  Selector(const std::string &name, Node **nodes, int length);
+  Selector(const std::string &name, Node **children, int length);
   Status tick() override final;
 
   FRIEND_TEST(SelectorTest, Tick);
@@ -57,7 +57,21 @@ private:
   const int threshold;
 
 public:
-  Parallel(const std::string &name, Node **nodes, int length, int threshold);
+  Parallel(const std::string &name, Node **children, int length, int threshold);
+  Status tick() override final;
+};
+
+class Decorator: public Node {
+protected:
+  Node *child;
+
+public:
+  Decorator(const std::string &name, Node *child);
+};
+
+class Inverter final: public Decorator {
+public:
+  Inverter(const std::string &name, Node *child);
   Status tick() override final;
 };
 } // namespace BT

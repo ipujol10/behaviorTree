@@ -9,20 +9,20 @@ std::string Node::getName() const { return name; }
 
 Status Node::status() const { return state; }
 
-ControlNode::ControlNode(const std::string &name, Node **nodes, int length)
+ControlNode::ControlNode(const std::string &name, Node **children, int length)
     : length(length), Node(name), counter(0) {
-  this->nodes = new Node *[length];
+  this->children = new Node *[length];
   for (int i = 0; i < length; i++) {
-    this->nodes[i] = nodes[i];
+    this->children[i] = children[i];
   }
 }
 
-ControlNode::~ControlNode() { delete[] nodes; }
+ControlNode::~ControlNode() { delete[] children; }
 
 int ControlNode::getLength() const { return length; }
 
-Sequence::Sequence(const std::string &name, Node **nodes, int length)
-    : ControlNode(name, nodes, length) {}
+Sequence::Sequence(const std::string &name, Node **children, int length)
+    : ControlNode(name, children, length) {}
 
 Status Sequence::tick() {
   if (state != Status::RUNNING) {
@@ -30,7 +30,7 @@ Status Sequence::tick() {
   }
 
   for (; counter < length; counter++) {
-    state = nodes[counter]->tick();
+    state = children[counter]->tick();
     if (state != Status::SUCCESS) {
       return state;
     }
@@ -38,12 +38,12 @@ Status Sequence::tick() {
   return Status::SUCCESS;
 }
 
-Selector::Selector(const std::string &name, Node **nodes, int length)
-    : ControlNode(name, nodes, length) {}
+Selector::Selector(const std::string &name, Node **children, int length)
+    : ControlNode(name, children, length) {}
 
 Status Selector::tick() {
   for (counter = 0; counter < length; counter++) {
-    state = nodes[counter]->tick();
+    state = children[counter]->tick();
     if (state != Status::FAILURE) {
       return state;
     }
@@ -51,14 +51,14 @@ Status Selector::tick() {
   return Status::FAILURE;
 }
 
-Parallel::Parallel(const std::string &name, Node **nodes, int length,
+Parallel::Parallel(const std::string &name, Node **children, int length,
                    int threshold)
-    : threshold(threshold), ControlNode(name, nodes, length) {}
+    : threshold(threshold), ControlNode(name, children, length) {}
 
 Status Parallel::tick() {
   int success = 0, failure = 0;
   for (counter = 0; counter < length; counter++) {
-    switch (nodes[counter]->tick()) {
+    switch (children[counter]->tick()) {
     case Status::SUCCESS:
       success++;
       break;
@@ -77,5 +77,23 @@ Status Parallel::tick() {
     return Status::FAILURE;
   }
   return Status::RUNNING;
+}
+
+Decorator::Decorator(const std::string &name, Node *child)
+    : Node(name), child(child) {}
+
+Inverter::Inverter(const std::string &name, Node *child)
+    : Decorator(name, child) {}
+
+Status Inverter::tick() {
+  switch (child->tick()) {
+  case Status::RUNNING:
+    return Status::RUNNING;
+  case Status::FAILURE:
+    return Status::SUCCESS;
+  case Status::SUCCESS:
+    return Status::FAILURE;
+  }
+  throw -10;
 }
 } // namespace BT

@@ -38,7 +38,7 @@ TEST(ControlNodeTest, Constructor) {
   for (int i = 0; i < control.getLength(); i++) {
     std::stringstream nodeName;
     nodeName << "Node " << i;
-    EXPECT_EQ(control.nodes[i]->getName(), nodeName.str());
+    EXPECT_EQ(control.children[i]->getName(), nodeName.str());
   }
   delete[] nodes;
 }
@@ -165,6 +165,17 @@ TEST(ParallelTest, Tick) {
   EXPECT_EQ(running.tick(), Status::RUNNING);
   EXPECT_EQ(running.tick(), Status::RUNNING);
 
+  EXPECT_EQ(failure.tick(), Status::FAILURE);
+}
+
+TEST(InverterTest, Tick) {
+  Inverter success("Success", new ControlTestTick("Fail", Status::FAILURE));
+  EXPECT_EQ(success.tick(), Status::SUCCESS);
+
+  Inverter running("Running", new ControlTestTick("Runn", Status::RUNNING));
+  EXPECT_EQ(running.tick(), Status::RUNNING);
+
+  Inverter failure("Failure", new ControlTestTick("Succ", Status::SUCCESS));
   EXPECT_EQ(failure.tick(), Status::FAILURE);
 }
 } // namespace BT
