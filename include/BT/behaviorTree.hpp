@@ -44,11 +44,20 @@ public:
   FRIEND_TEST(SequenceTest, Tick);
 };
 
-class Selector final: public ControlNode {
+class Selector final : public ControlNode {
 public:
   Selector(const std::string &name, Node **nodes, int length);
   Status tick() override final;
 
   FRIEND_TEST(SelectorTest, Tick);
+};
+
+class Parallel final : public ControlNode {
+private:
+  const int threshold;
+
+public:
+  Parallel(const std::string &name, Node **nodes, int length, int threshold);
+  Status tick() override final;
 };
 } // namespace BT

@@ -50,4 +50,32 @@ Status Selector::tick() {
   }
   return Status::FAILURE;
 }
+
+Parallel::Parallel(const std::string &name, Node **nodes, int length,
+                   int threshold)
+    : threshold(threshold), ControlNode(name, nodes, length) {}
+
+Status Parallel::tick() {
+  int success = 0, failure = 0;
+  for (counter = 0; counter < length; counter++) {
+    switch (nodes[counter]->tick()) {
+    case Status::SUCCESS:
+      success++;
+      break;
+    case Status::FAILURE:
+      failure++;
+      break;
+    case Status::RUNNING:
+      break;
+    }
+  }
+
+  if (success >= threshold) {
+    return Status::SUCCESS;
+  }
+  if (failure > (length - threshold)) {
+    return Status::FAILURE;
+  }
+  return Status::RUNNING;
+}
 } // namespace BT

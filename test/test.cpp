@@ -126,4 +126,45 @@ TEST(SelectorTest, Tick) {
   EXPECT_EQ(failure.tick(), Status::FAILURE);
   EXPECT_EQ(failure.counter, 3);
 }
+
+TEST(ParallelTest, Tick) {
+  Node *successNodes0[] = {new ControlTestTick("Succ 0", Status::SUCCESS),
+                           new ControlTestTick("Succ 1", Status::SUCCESS),
+                           new ControlTestTick("Succ 2", Status::SUCCESS),
+                           new ControlTestTick("Succ 3", Status::SUCCESS),
+                           new ControlTestTick("Succ 4", Status::SUCCESS)};
+  Parallel success0("Success 0", successNodes0, 5, 3);
+
+  Node *successNodes1[] = {new ControlTestTick("Succ 0", Status::SUCCESS),
+                           new ControlTestTick("Succ 1", Status::SUCCESS),
+                           new ControlTestTick("Succ 2", Status::SUCCESS),
+                           new ControlTestTick("Fail 0", Status::FAILURE),
+                           new ControlTestTick("Runn 0", Status::RUNNING)};
+  Parallel success1("Success 1", successNodes1, 5, 3);
+
+  Node *runningNodes[] = {new ControlTestTick("Succ 0", Status::SUCCESS),
+                          new ControlTestTick("Succ 1", Status::SUCCESS),
+                          new ControlTestTick("Fail 0", Status::FAILURE),
+                          new ControlTestTick("Fail 1", Status::FAILURE),
+                          new ControlTestTick("Runn 0", Status::RUNNING)};
+  Parallel running("Running", runningNodes, 5, 3);
+
+  Node *failureNodes[] = {new ControlTestTick("Succ 0", Status::SUCCESS),
+                          new ControlTestTick("Fail 0", Status::FAILURE),
+                          new ControlTestTick("Fail 1", Status::FAILURE),
+                          new ControlTestTick("Fail 2", Status::FAILURE),
+                          new ControlTestTick("Runn 0", Status::RUNNING)};
+  Parallel failure("Failure", failureNodes, 5, 3);
+
+  EXPECT_EQ(success0.tick(), Status::SUCCESS);
+  EXPECT_EQ(success0.tick(), Status::SUCCESS);
+
+  EXPECT_EQ(success1.tick(), Status::SUCCESS);
+  EXPECT_EQ(success1.tick(), Status::SUCCESS);
+
+  EXPECT_EQ(running.tick(), Status::RUNNING);
+  EXPECT_EQ(running.tick(), Status::RUNNING);
+
+  EXPECT_EQ(failure.tick(), Status::FAILURE);
+}
 } // namespace BT
