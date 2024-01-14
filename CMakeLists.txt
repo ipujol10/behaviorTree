@@ -6,8 +6,12 @@ set(CMAKE_CXX_STANDARD 17)
 project(${LIBRARY_NAME} VERSION 1.0)
 
 add_library(${LIBRARY_NAME} STATIC
-    include/BT/behaviorTree.hpp
-    src/behaviorTree.cpp
+    include/BT/node.hpp
+    include/BT/control.hpp
+    include/BT/decorators.hpp
+    src/node.cpp
+    src/control.cpp
+    src/decorators.cpp
     )
 
 target_include_directories(${LIBRARY_NAME} PRIVATE

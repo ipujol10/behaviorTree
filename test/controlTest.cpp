@@ -1,25 +1,6 @@
-#include <BT/behaviorTree.hpp>
+#include "helper.hpp"
+#include <BT/control.hpp>
 #include <gtest/gtest.h>
-#include <sstream>
-
-TEST(NodeTest, Constructor) {
-  BT::Node node("Constructor");
-  EXPECT_EQ(node.getName(), "Constructor");
-}
-
-TEST(NodeTest, Tick) {
-  BT::Node node("Tick");
-  EXPECT_THROW(
-      {
-        try {
-          node.tick();
-        } catch (int e) {
-          EXPECT_EQ(e, -1);
-          throw;
-        }
-      },
-      int);
-}
 
 namespace BT {
 TEST(ControlNodeTest, Constructor) {
@@ -42,16 +23,6 @@ TEST(ControlNodeTest, Constructor) {
   }
   delete[] nodes;
 }
-
-class ControlTestTick : public Node {
-public:
-  ControlTestTick(const std::string &name, Status status) : Node(name) {
-    state = status;
-  }
-
-  Status tick() override { return state; }
-};
-
 TEST(SequenceTest, Tick) {
   Node *successNodes[] = {new ControlTestTick("Succ 0", Status::SUCCESS),
                           new ControlTestTick("Succ 1", Status::SUCCESS),
@@ -86,7 +57,6 @@ TEST(SequenceTest, Tick) {
   EXPECT_EQ(failure.counter, 2);
   EXPECT_EQ(failure.status(), Status::FAILURE);
 }
-
 TEST(SelectorTest, Tick) {
   Node *successNodes0[] = {new ControlTestTick("Succ 0", Status::SUCCESS),
                            new ControlTestTick("Succ 1", Status::SUCCESS)};
@@ -126,56 +96,50 @@ TEST(SelectorTest, Tick) {
   EXPECT_EQ(failure.tick(), Status::FAILURE);
   EXPECT_EQ(failure.counter, 3);
 }
+} // namespace BT
 
 TEST(ParallelTest, Tick) {
-  Node *successNodes0[] = {new ControlTestTick("Succ 0", Status::SUCCESS),
-                           new ControlTestTick("Succ 1", Status::SUCCESS),
-                           new ControlTestTick("Succ 2", Status::SUCCESS),
-                           new ControlTestTick("Succ 3", Status::SUCCESS),
-                           new ControlTestTick("Succ 4", Status::SUCCESS)};
-  Parallel success0("Success 0", successNodes0, 5, 3);
+  BT::Node *successNodes0[] = {
+      new ControlTestTick("Succ 0", BT::Status::SUCCESS),
+      new ControlTestTick("Succ 1", BT::Status::SUCCESS),
+      new ControlTestTick("Succ 2", BT::Status::SUCCESS),
+      new ControlTestTick("Succ 3", BT::Status::SUCCESS),
+      new ControlTestTick("Succ 4", BT::Status::SUCCESS)};
+  BT::Parallel success0("Success 0", successNodes0, 5, 3);
 
-  Node *successNodes1[] = {new ControlTestTick("Succ 0", Status::SUCCESS),
-                           new ControlTestTick("Succ 1", Status::SUCCESS),
-                           new ControlTestTick("Succ 2", Status::SUCCESS),
-                           new ControlTestTick("Fail 0", Status::FAILURE),
-                           new ControlTestTick("Runn 0", Status::RUNNING)};
-  Parallel success1("Success 1", successNodes1, 5, 3);
+  BT::Node *successNodes1[] = {
+      new ControlTestTick("Succ 0", BT::Status::SUCCESS),
+      new ControlTestTick("Succ 1", BT::Status::SUCCESS),
+      new ControlTestTick("Succ 2", BT::Status::SUCCESS),
+      new ControlTestTick("Fail 0", BT::Status::FAILURE),
+      new ControlTestTick("Runn 0", BT::Status::RUNNING)};
+  BT::Parallel success1("Success 1", successNodes1, 5, 3);
 
-  Node *runningNodes[] = {new ControlTestTick("Succ 0", Status::SUCCESS),
-                          new ControlTestTick("Succ 1", Status::SUCCESS),
-                          new ControlTestTick("Fail 0", Status::FAILURE),
-                          new ControlTestTick("Fail 1", Status::FAILURE),
-                          new ControlTestTick("Runn 0", Status::RUNNING)};
-  Parallel running("Running", runningNodes, 5, 3);
+  BT::Node *runningNodes[] = {
+      new ControlTestTick("Succ 0", BT::Status::SUCCESS),
+      new ControlTestTick("Succ 1", BT::Status::SUCCESS),
+      new ControlTestTick("Fail 0", BT::Status::FAILURE),
+      new ControlTestTick("Fail 1", BT::Status::FAILURE),
+      new ControlTestTick("Runn 0", BT::Status::RUNNING)};
+  BT::Parallel running("Running", runningNodes, 5, 3);
 
-  Node *failureNodes[] = {new ControlTestTick("Succ 0", Status::SUCCESS),
-                          new ControlTestTick("Fail 0", Status::FAILURE),
-                          new ControlTestTick("Fail 1", Status::FAILURE),
-                          new ControlTestTick("Fail 2", Status::FAILURE),
-                          new ControlTestTick("Runn 0", Status::RUNNING)};
-  Parallel failure("Failure", failureNodes, 5, 3);
+  BT::Node *failureNodes[] = {
+      new ControlTestTick("Succ 0", BT::Status::SUCCESS),
+      new ControlTestTick("Fail 0", BT::Status::FAILURE),
+      new ControlTestTick("Fail 1", BT::Status::FAILURE),
+      new ControlTestTick("Fail 2", BT::Status::FAILURE),
+      new ControlTestTick("Runn 0", BT::Status::RUNNING)};
+  BT::Parallel failure("Failure", failureNodes, 5, 3);
 
-  EXPECT_EQ(success0.tick(), Status::SUCCESS);
-  EXPECT_EQ(success0.tick(), Status::SUCCESS);
+  EXPECT_EQ(success0.tick(), BT::Status::SUCCESS);
+  EXPECT_EQ(success0.tick(), BT::Status::SUCCESS);
 
-  EXPECT_EQ(success1.tick(), Status::SUCCESS);
-  EXPECT_EQ(success1.tick(), Status::SUCCESS);
+  EXPECT_EQ(success1.tick(), BT::Status::SUCCESS);
+  EXPECT_EQ(success1.tick(), BT::Status::SUCCESS);
 
-  EXPECT_EQ(running.tick(), Status::RUNNING);
-  EXPECT_EQ(running.tick(), Status::RUNNING);
+  EXPECT_EQ(running.tick(), BT::Status::RUNNING);
+  EXPECT_EQ(running.tick(), BT::Status::RUNNING);
 
-  EXPECT_EQ(failure.tick(), Status::FAILURE);
+  EXPECT_EQ(failure.tick(), BT::Status::FAILURE);
+  EXPECT_EQ(failure.tick(), BT::Status::FAILURE);
 }
-
-TEST(InverterTest, Tick) {
-  Inverter success("Success", new ControlTestTick("Fail", Status::FAILURE));
-  EXPECT_EQ(success.tick(), Status::SUCCESS);
-
-  Inverter running("Running", new ControlTestTick("Runn", Status::RUNNING));
-  EXPECT_EQ(running.tick(), Status::RUNNING);
-
-  Inverter failure("Failure", new ControlTestTick("Succ", Status::SUCCESS));
-  EXPECT_EQ(failure.tick(), Status::FAILURE);
-}
-} // namespace BT

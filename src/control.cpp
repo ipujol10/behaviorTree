@@ -1,14 +1,6 @@
-#include "behaviorTree.hpp"
+#include "control.hpp"
 
 namespace BT {
-Node::Node(const std::string &name) : name(name) {}
-
-Status Node::tick() { throw -1; }
-
-std::string Node::getName() const { return name; }
-
-Status Node::status() const { return state; }
-
 ControlNode::ControlNode(const std::string &name, Node **children, int length)
     : length(length), Node(name), counter(0) {
   this->children = new Node *[length];
@@ -77,23 +69,5 @@ Status Parallel::tick() {
     return Status::FAILURE;
   }
   return Status::RUNNING;
-}
-
-Decorator::Decorator(const std::string &name, Node *child)
-    : Node(name), child(child) {}
-
-Inverter::Inverter(const std::string &name, Node *child)
-    : Decorator(name, child) {}
-
-Status Inverter::tick() {
-  switch (child->tick()) {
-  case Status::RUNNING:
-    return Status::RUNNING;
-  case Status::FAILURE:
-    return Status::SUCCESS;
-  case Status::SUCCESS:
-    return Status::FAILURE;
-  }
-  throw -10;
 }
 } // namespace BT
