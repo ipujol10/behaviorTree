@@ -5,14 +5,19 @@ set(CMAKE_CXX_STANDARD 17)
 
 project(${LIBRARY_NAME} VERSION 1.0)
 
-add_library(${LIBRARY_NAME} STATIC
-    include/BT/node.hpp
-    include/BT/control.hpp
-    include/BT/decorators.hpp
-    src/node.cpp
-    src/control.cpp
-    src/decorators.cpp
-    )
+set(SOURCE node.cpp control.cpp decorators.cpp)
+foreach(item IN LISTS SOURCE)
+    list(APPEND SOURCE src/${item})
+    list(REMOVE_ITEM SOURCE ${item})
+endforeach()
+
+set(HEADER node.hpp control.hpp decorators.hpp)
+foreach(item IN LISTS HEADER)
+    list(APPEND HEADER include/BT/${item})
+    list(REMOVE_ITEM HEADER ${item})
+endforeach()
+
+add_library(${LIBRARY_NAME} STATIC ${HEADER} ${SOURCE})
 
 target_include_directories(${LIBRARY_NAME} PRIVATE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/BT>
@@ -41,3 +46,7 @@ if (BUILD_TEST)
     enable_testing()
     add_test(NAME BehaviorTreeTest COMMAND BehaviorTreeTest)
 endif()
+
+set(installable_lib ${LIBRARY_NAME})
+install(TARGETS ${installable_lib} DESTINATION lib)
+install(FILES ${HEADER} DESTINATION include/BT)

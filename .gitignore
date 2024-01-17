@@ -35,3 +35,6 @@
 out/
 .cache/
 compile_commands.json
+
+# Standard build directory
+build/
