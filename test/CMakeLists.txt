@@ -10,6 +10,7 @@ if (BUILD_TEST)
         )
     FetchContent_MakeAvailable(googletest)
 
-    add_executable(${TEST_NAME} test.cpp)
+    add_executable(${TEST_NAME} nodeTest.cpp controlTest.cpp 
+        decoratorsTest.cpp helper.hpp)
     target_link_libraries(${TEST_NAME} gtest_main BehaviorTree)
 endif()
