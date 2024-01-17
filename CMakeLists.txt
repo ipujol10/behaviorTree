@@ -49,3 +49,4 @@ endif()
 
 set(installable_lib ${LIBRARY_NAME})
 install(TARGETS ${installable_lib} DESTINATION lib)
+install(FILES ${HEADER} DESTINATION include/BT)
