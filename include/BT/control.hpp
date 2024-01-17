@@ -18,28 +18,28 @@ public:
   FRIEND_TEST(ControlNodeTest, Constructor);
 };
 
-class Sequence final : public ControlNode {
+class Sequence : public ControlNode {
 public:
   Sequence(const std::string &name, Node **children, int length);
-  Status tick() override;
+  Status tick() override final;
 
   FRIEND_TEST(SequenceTest, Tick);
 };
 
-class Selector final : public ControlNode {
+class Selector : public ControlNode {
 public:
   Selector(const std::string &name, Node **children, int length);
-  Status tick() override;
+  Status tick() override final;
 
   FRIEND_TEST(SelectorTest, Tick);
 };
 
-class Parallel final : public ControlNode {
+class Parallel : public ControlNode {
 private:
   const int threshold;
 
 public:
   Parallel(const std::string &name, Node **children, int length, int threshold);
-  Status tick() override;
+  Status tick() override final;
 };
 } // namespace BT
