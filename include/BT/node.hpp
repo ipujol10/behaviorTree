@@ -1,13 +1,15 @@
 #pragma once
 
+#include <iostream>
 #include <string>
 
 namespace BT {
 enum Status {
   SUCCESS,
-  FAILURE,
   RUNNING,
+  FAILURE,
 };
+std::ostream &operator<<(std::ostream &out, const Status st);
 
 class Node {
 protected:
