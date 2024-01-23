@@ -5,7 +5,7 @@
 namespace BT {
 class Decorator : public Node {
 protected:
-  Node *child;
+  Node *const child;
 
 public:
   Decorator(const std::string &name, Node *child);
@@ -14,6 +14,12 @@ public:
 class Inverter final : public Decorator {
 public:
   Inverter(const std::string &name, Node *child);
-  Status tick() override final;
+  Status tick() override;
+};
+
+class ForceSuccess final : public Decorator {
+public:
+  ForceSuccess(const std::string &name, Node *child);
+  Status tick() override;
 };
 } // namespace BT

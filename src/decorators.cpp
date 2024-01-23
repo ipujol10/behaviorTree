@@ -18,4 +18,14 @@ Status Inverter::tick() {
   }
   throw -10;
 }
+
+ForceSuccess::ForceSuccess(const std::string &name, Node *child)
+    : Decorator(name, child) {}
+
+Status ForceSuccess::tick() {
+  if (child->tick() == Status::RUNNING) {
+    return Status::RUNNING;
+  }
+  return Status::SUCCESS;
+}
 } // namespace BT
