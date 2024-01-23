@@ -28,4 +28,15 @@ public:
   ForceFailure(const std::string &name, Node *child);
   Status tick() override;
 };
+
+class Repeat final : public Decorator {
+private:
+  const int N;
+  int i;
+  bool blocked;
+
+public:
+  Repeat(const std::string &name, Node *child, int N);
+  Status tick() override;
+};
 } // namespace BT

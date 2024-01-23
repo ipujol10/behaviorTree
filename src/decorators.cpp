@@ -38,4 +38,24 @@ Status ForceFailure::tick() {
   }
   return Status::FAILURE;
 }
+
+Repeat::Repeat(const std::string &name, Node *child, int N)
+    : N(N), i(0), blocked(false), Decorator(name, child) {}
+
+Status Repeat::tick() {
+  if (blocked) {
+    return state;
+  }
+
+  state = child->tick();
+  if (state == Status::RUNNING) {
+    return state;
+  }
+
+  i++;
+  if (i >= N || state == Status::FAILURE) {
+    blocked = true;
+  }
+  return state;
+}
 } // namespace BT
