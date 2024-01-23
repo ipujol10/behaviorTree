@@ -28,4 +28,14 @@ Status ForceSuccess::tick() {
   }
   return Status::SUCCESS;
 }
+
+ForceFailure::ForceFailure(const std::string &name, Node *child)
+    : Decorator(name, child) {}
+
+Status ForceFailure::tick() {
+  if (child->tick() == Status::RUNNING) {
+    return Status::RUNNING;
+  }
+  return Status::FAILURE;
+}
 } // namespace BT

@@ -22,4 +22,10 @@ public:
   ForceSuccess(const std::string &name, Node *child);
   Status tick() override;
 };
+
+class ForceFailure final : public Decorator {
+public:
+  ForceFailure(const std::string &name, Node *child);
+  Status tick() override;
+};
 } // namespace BT

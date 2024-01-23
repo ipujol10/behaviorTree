@@ -29,3 +29,17 @@ TEST(ForceSuccessTest, Tick) {
                             new ControlTestTick("Fail", BT::Status::FAILURE));
   EXPECT_EQ(success1.tick(), BT::Status::SUCCESS);
 }
+
+TEST(ForceFailureTest, Tick) {
+  BT::ForceFailure failure0("Failure0",
+                            new ControlTestTick("Succ", BT::Status::SUCCESS));
+  EXPECT_EQ(failure0.tick(), BT::Status::FAILURE);
+
+  BT::ForceFailure running("Running",
+                           new ControlTestTick("Runn", BT::Status::RUNNING));
+  EXPECT_EQ(running.tick(), BT::Status::RUNNING);
+
+  BT::ForceFailure failure1("failure1",
+                            new ControlTestTick("Fail", BT::Status::FAILURE));
+  EXPECT_EQ(failure1.tick(), BT::Status::FAILURE);
+}
