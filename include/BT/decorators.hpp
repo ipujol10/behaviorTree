@@ -33,10 +33,19 @@ class Repeat final : public Decorator {
 private:
   const int N;
   int i;
-  bool blocked;
 
 public:
   Repeat(const std::string &name, Node *child, int N);
+  Status tick() override;
+};
+
+class RetryUntilSuccessful final: public Decorator {
+private:
+  const int N;
+  int i;
+
+public:
+  RetryUntilSuccessful(const std::string &name, Node *child, int N);
   Status tick() override;
 };
 } // namespace BT

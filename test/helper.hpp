@@ -9,14 +9,14 @@ public:
   BT::Status tick() override { return state; }
 };
 
-class SuccessionTestTick : public BT::Node {
+class SequenceTestTick : public BT::Node {
 private:
   BT::Status succession[50];
   int i;
   const int length;
 
 public:
-  SuccessionTestTick(const std::string &name, BT::Status succession[], int N)
+  SequenceTestTick(const std::string &name, BT::Status succession[], int N)
       : length(N), i(N), Node(name) {
     for (int k = 0; k < N; k++) {
       this->succession[k] = succession[k];

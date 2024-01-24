@@ -1,4 +1,5 @@
 #include "decorators.hpp"
+#include "node.hpp"
 
 namespace BT {
 Decorator::Decorator(const std::string &name, Node *child)
@@ -40,22 +41,39 @@ Status ForceFailure::tick() {
 }
 
 Repeat::Repeat(const std::string &name, Node *child, int N)
-    : N(N), i(0), blocked(false), Decorator(name, child) {}
+    : N(N), i(0), Decorator(name, child) {}
 
 Status Repeat::tick() {
-  if (blocked) {
-    return state;
+  for (; i < N; i++) {
+    state = child->tick();
+    if (state == Status::RUNNING) {
+      return Status::RUNNING;
+    }
+    if (state == Status::FAILURE) {
+      i = 0;
+      return Status::FAILURE;
+    }
   }
+  i = 0;
+  return Status::SUCCESS;
+}
 
-  state = child->tick();
-  if (state == Status::RUNNING) {
-    return state;
-  }
+RetryUntilSuccessful::RetryUntilSuccessful(const std::string &name, Node *child,
+                                           int N)
+    : N(N), i(0), Decorator(name, child) {}
 
-  i++;
-  if (i >= N || state == Status::FAILURE) {
-    blocked = true;
+Status RetryUntilSuccessful::tick() {
+  for (; i < N; i++) {
+    state = child->tick();
+    if (state == Status::RUNNING) {
+      return Status::RUNNING;
+    }
+    if (state == Status::SUCCESS) {
+      i = 0;
+      return Status::SUCCESS;
+    }
   }
-  return state;
+  i = 0;
+  return Status::FAILURE;
 }
 } // namespace BT
