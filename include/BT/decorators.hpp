@@ -39,7 +39,7 @@ public:
   Status tick() override;
 };
 
-class RetryUntilSuccessful final: public Decorator {
+class RetryUntilSuccessful final : public Decorator {
 private:
   const int N;
   int i;
@@ -49,9 +49,20 @@ public:
   Status tick() override;
 };
 
-class KeepRunningUntilFailure final: public Decorator {
+class KeepRunningUntilFailure final : public Decorator {
 public:
   KeepRunningUntilFailure(const std::string &name, Node *child);
+  Status tick() override;
+};
+
+class Delay final : public Decorator {};
+
+class RunOnce final : public Decorator {
+private:
+  bool blocked;
+
+public:
+  RunOnce(const std::string &name, Node *child);
   Status tick() override;
 };
 } // namespace BT

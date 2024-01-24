@@ -146,3 +146,27 @@ TEST(KeepRunningUntilFailureTest, Tick) {
     EXPECT_EQ(failure1.tick(), BT::Status::FAILURE);
   }
 }
+
+TEST(DelayTest, Tick) { EXPECT_TRUE(false); }
+
+TEST(RunOnceTest, Tick) {
+  BT::Status succ0[] = {BT::Status::RUNNING, BT::Status::RUNNING,
+                        BT::Status::SUCCESS, BT::Status::FAILURE};
+  BT::RunOnce success0("Success0", new SeqTestTick("succ0", succ0, 4));
+  for (int i = 0; i < 2; i++) {
+    EXPECT_EQ(success0.tick(), BT::Status::RUNNING);
+  }
+  for (int i = 0; i < 10; i++) {
+    EXPECT_EQ(success0.tick(), BT::Status::SUCCESS);
+  }
+
+  BT::Status fail0[] = {BT::Status::RUNNING, BT::Status::RUNNING,
+                        BT::Status::FAILURE, BT::Status::SUCCESS};
+  BT::RunOnce failure0("failure0", new SeqTestTick("fail0", fail0, 4));
+  for (int i = 0; i < 2; i++) {
+    EXPECT_EQ(failure0.tick(), BT::Status::RUNNING);
+  }
+  for (int i = 0; i < 10; i++) {
+    EXPECT_EQ(failure0.tick(), BT::Status::FAILURE);
+  }
+}

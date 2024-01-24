@@ -87,4 +87,18 @@ Status KeepRunningUntilFailure::tick() {
   }
   return Status::RUNNING;
 }
+
+RunOnce::RunOnce(const std::string &name, Node *child)
+    : blocked(false), Decorator(name, child) {}
+
+Status RunOnce::tick() {
+  if (blocked) {
+    return state;
+  }
+  state = child->tick();
+  if (state != Status::RUNNING) {
+    blocked = true;
+  }
+  return state;
+}
 } // namespace BT
