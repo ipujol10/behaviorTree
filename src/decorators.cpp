@@ -76,4 +76,15 @@ Status RetryUntilSuccessful::tick() {
   i = 0;
   return Status::FAILURE;
 }
+
+KeepRunningUntilFailure::KeepRunningUntilFailure(const std::string &name,
+                                                 Node *child)
+    : Decorator(name, child) {}
+
+Status KeepRunningUntilFailure::tick() {
+  if (child->tick() == Status::FAILURE) {
+    return Status::FAILURE;
+  }
+  return Status::RUNNING;
+}
 } // namespace BT

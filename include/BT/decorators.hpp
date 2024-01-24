@@ -48,4 +48,10 @@ public:
   RetryUntilSuccessful(const std::string &name, Node *child, int N);
   Status tick() override;
 };
+
+class KeepRunningUntilFailure final: public Decorator {
+public:
+  KeepRunningUntilFailure(const std::string &name, Node *child);
+  Status tick() override;
+};
 } // namespace BT
